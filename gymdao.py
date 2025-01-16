@@ -1,6 +1,3 @@
-from db_connector import get_connection
-from gym import Gym
-
 class GymDAO:
     @staticmethod
     def create_gym(name, city):
@@ -35,12 +32,23 @@ class GymDAO:
     def delete_gym(gym_id):
         connection = get_connection()
         try:
+            GymDAO.show_gyms_count(connection)
+            
             with connection.cursor() as cursor:
                 query = "DELETE FROM Gym WHERE gym_id = %s"
                 cursor.execute(query, (gym_id,))
             connection.commit()
+            GymDAO.show_gyms_count(connection)
+            
         except Exception as e:
             print(f"Chyba při mazání Gymu: {e}")
             connection.rollback()
         finally:
             connection.close()
+
+    @staticmethod
+    def show_gyms_count(connection):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM Gym")
+            row = cursor.fetchone()
+            print(f"Počet gymů: {row[0]}")
