@@ -1,3 +1,6 @@
+from gym import Gym
+from db_connector import get_connection
+
 class GymDAO:
     @staticmethod
     def create_gym(name, city):
@@ -52,3 +55,18 @@ class GymDAO:
             cursor.execute("SELECT COUNT(*) FROM Gym")
             row = cursor.fetchone()
             print(f"Počet gymů: {row[0]}")
+
+    @staticmethod
+    def get_all_gyms():
+        connection = get_connection()
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM Gym"
+                cursor.execute(query)
+                gyms = cursor.fetchall()
+                return gyms
+        except Exception as e:
+            print(f"Chyba při načítání všech gymů: {e}")
+            return []
+        finally:
+            connection.close()

@@ -1,6 +1,6 @@
 def create_tables_and_views(connection):
     cursor = connection.cursor()
-
+    print("Connected to database")
     cursor.execute("create database if not exists pokemon_db;")
 
     cursor.execute("""
@@ -18,7 +18,7 @@ def create_tables_and_views(connection):
         name varchar(50) not null,
         type enum('Fire', 'Water', 'Grass') not null,
         level int not null,
-        trainer_id int,
+        trainer_id int null,
         foreign key (trainer_id) references trainer(trainer_id) on delete set null
     );
     """)

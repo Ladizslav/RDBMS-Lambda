@@ -49,13 +49,24 @@ class PokemonDAO:
             connection.close()
 
     @staticmethod
+    def get_all_pokemons(connection):
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM Pokemon"
+                cursor.execute(query)
+                pokemons = cursor.fetchall()
+                return pokemons
+        except Exception as e:
+            print(f"Chyba při načítání Pokémonů: {e}")
+            return []
+
+    @staticmethod
     def show_pokemons_count(connection):
         with connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM Pokemon")
             row = cursor.fetchone()
             print(f"Počet Pokémonů: {row[0]}")
 
-    @staticmethod
     def import_pokemons_from_csv(file_path):
         connection = get_connection()
         try:
@@ -63,12 +74,12 @@ class PokemonDAO:
                 reader = csv.DictReader(csv_file)
                 with connection.cursor() as cursor:
                     for row in reader:
-                        try:
-                            query = """
-                                INSERT INTO Pokemon (name, type, level, trainer_id) 
-                                VALUES (%s, %s, %s, %s)
-                            """
-                            cursor.execute(query, (row['name'], row['type'], int(row['level']),int(row['trainer_id']) if row['trainer_id'] else None))
+                        trainer_id = int(row['trainer_id']) if row['trainer_id'] else None
+                        query = """
+                            INSERT INTO Pokemon (name, type, level, trainer_id) 
+                            VALUES (%s, %s, %s, %s)
+                        """
+                        cursor.execute(query, (row['name'], row['type'], int(row['level']), trainer_id))
                     connection.commit()
                     print("Import Pokémonů dokončen.")
         except FileNotFoundError:

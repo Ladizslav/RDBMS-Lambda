@@ -15,7 +15,6 @@ def get_connection():
         )
 
         if connection.is_connected():
-            print("Connected to database")
             cursor = connection.cursor()
             cursor.execute(f"create database if not exists {config['database']};")
             cursor.execute(f"use {config['database']};")

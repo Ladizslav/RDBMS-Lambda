@@ -33,6 +33,25 @@ class TrainerDAO:
             connection.close()
 
     @staticmethod
+    def update_trainer(trainer_id, name, age, team):
+        connection = get_connection()
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                    UPDATE Trainer 
+                    SET name = %s, age = %s, team = %s 
+                    WHERE trainer_id = %s
+                """
+                cursor.execute(query, (name, age, team, trainer_id))
+            connection.commit()
+            print(f"Trenér s ID {trainer_id} byl aktualizován.")
+        except Exception as e:
+            print(f"Chyba při aktualizaci trenéra: {e}")
+            connection.rollback()
+        finally:
+            connection.close()
+
+    @staticmethod
     def delete_trainer(trainer_id):
         connection = get_connection()
         try:
@@ -49,11 +68,30 @@ class TrainerDAO:
             connection.close()
 
     @staticmethod
+    def get_all_trainers():
+        connection = get_connection()
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM Trainer"
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                return [Trainer(**row) for row in rows]
+        except Exception as e:
+            print(f"Chyba při načítání trenérů: {e}")
+            return []
+        finally:
+            connection.close()
+
+    @staticmethod
     def show_trainers_count(connection):
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM Trainer")
-            row = cursor.fetchone()
-            print(f"Počet trenérů: {row[0]}")
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM Trainer")
+                row = cursor.fetchone()
+                print(f"Počet trenérů: {row[0]}")
+        except Exception as e:
+            print(f"Chyba při získávání počtu trenérů: {e}")
+            raise
 
     @staticmethod
     def import_trainers_from_csv(file_path):
@@ -63,12 +101,11 @@ class TrainerDAO:
                 reader = csv.DictReader(csv_file)
                 with connection.cursor() as cursor:
                     for row in reader:
-                        try:
-                            query = """
-                                INSERT INTO Trainer (name, age, team) 
-                                VALUES (%s, %s, %s)
-                            """
-                            cursor.execute(query, (row['name'], int(row['age']), row['team']))
+                        query = """
+                            INSERT INTO Trainer (name, age, team) 
+                            VALUES (%s, %s, %s)
+                        """
+                        cursor.execute(query, (row['name'], int(row['age']), row['team']))
                     connection.commit()
                     print("Import trenérů dokončen.")
         except FileNotFoundError:
