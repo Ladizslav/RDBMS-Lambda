@@ -7,11 +7,11 @@ class GymDAO:
         connection = get_connection()
         try:
             with connection.cursor() as cursor:
-                query = "INSERT INTO Gym (name, city) VALUES (%s, %s)"
+                query = "insert into gym (name, city) values (%s, %s)"
                 cursor.execute(query, (name, city))
             connection.commit()
         except Exception as e:
-            print(f"Chyba při vytváření Gymu: {e}")
+            print(f"chyba při vytváření gymu: {e}")
             connection.rollback()
         finally:
             connection.close()
@@ -21,13 +21,13 @@ class GymDAO:
         connection = get_connection()
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM Gym WHERE gym_id = %s"
+                query = "select * from gym where gym_id = %s"
                 cursor.execute(query, (gym_id,))
                 row = cursor.fetchone()
                 if row:
                     return Gym(**row)
         except Exception as e:
-            print(f"Chyba při načítání Gymu: {e}")
+            print(f"Chyba při načítání gymu: {e}")
         finally:
             connection.close()
 
@@ -38,13 +38,13 @@ class GymDAO:
             GymDAO.show_gyms_count(connection)
             
             with connection.cursor() as cursor:
-                query = "DELETE FROM Gym WHERE gym_id = %s"
+                query = "delete from gym where gym_id = %s"
                 cursor.execute(query, (gym_id,))
             connection.commit()
             GymDAO.show_gyms_count(connection)
             
         except Exception as e:
-            print(f"Chyba při mazání Gymu: {e}")
+            print(f"Chyba při mazání gymu: {e}")
             connection.rollback()
         finally:
             connection.close()
@@ -52,7 +52,7 @@ class GymDAO:
     @staticmethod
     def show_gyms_count(connection):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM Gym")
+            cursor.execute("select count(*) from gym")
             row = cursor.fetchone()
             print(f"Počet gymů: {row[0]}")
 
@@ -61,7 +61,7 @@ class GymDAO:
         connection = get_connection()
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM Gym"
+                query = "select * from gym"
                 cursor.execute(query)
                 gyms = cursor.fetchall()
                 return gyms
