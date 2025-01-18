@@ -1,5 +1,5 @@
 from db_connector import get_connection
-from pokemon import Pokemon
+from classes.pokemon import Pokemon
 import csv
 
 class PokemonDAO:
@@ -8,11 +8,11 @@ class PokemonDAO:
         connection = get_connection()
         try:
             with connection.cursor() as cursor:
-                query = "INSERT INTO Pokemon (name, type, level, trainer_id) VALUES (%s, %s, %s, %s)"
+                query = "insert into pokemon (name, type, level, trainer_id) values (%s, %s, %s, %s)"
                 cursor.execute(query, (name, pokemon_type, level, trainer_id))
             connection.commit()
         except Exception as e:
-            print(f"Chyba při vytváření Pokémona: {e}")
+            print(f"Chyba při vytváření pokémona: {e}")
             connection.rollback()
         finally:
             connection.close()
@@ -22,13 +22,13 @@ class PokemonDAO:
         connection = get_connection()
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM Pokemon WHERE pokemon_id = %s"
+                query = "select * from pokemon where id = %s"
                 cursor.execute(query, (pokemon_id,))
                 row = cursor.fetchone()
                 if row:
                     return Pokemon(**row)
         except Exception as e:
-            print(f"Chyba při načítání Pokémona: {e}")
+            print(f"Chyba při načítání pokémona: {e}")
         finally:
             connection.close()
 
@@ -36,14 +36,12 @@ class PokemonDAO:
     def delete_pokemon(pokemon_id):
         connection = get_connection()
         try:
-            PokemonDAO.show_pokemons_count(connection)
             with connection.cursor() as cursor:
-                query = "DELETE FROM Pokemon WHERE pokemon_id = %s"
+                query = "delete from pokemon where id = %s"
                 cursor.execute(query, (pokemon_id,))
             connection.commit()
-            PokemonDAO.show_pokemons_count(connection)
         except Exception as e:
-            print(f"Chyba při mazání Pokémona: {e}")
+            print(f"Chyba při mazání pokémona: {e}")
             connection.rollback()
         finally:
             connection.close()
@@ -52,20 +50,20 @@ class PokemonDAO:
     def get_all_pokemons(connection):
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM Pokemon"
+                query = "select * from pokemon"
                 cursor.execute(query)
                 pokemons = cursor.fetchall()
                 return pokemons
         except Exception as e:
-            print(f"Chyba při načítání Pokémonů: {e}")
+            print(f"Chyba při načítání pokémonů: {e}")
             return []
 
     @staticmethod
     def show_pokemons_count(connection):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM Pokemon")
+            cursor.execute("select count(*) from pokemon")
             row = cursor.fetchone()
-            print(f"Počet Pokémonů: {row[0]}")
+            print(f"Počet pokémonů: {row[0]}")
 
     def import_pokemons_from_csv(file_path):
         connection = get_connection()
@@ -76,16 +74,28 @@ class PokemonDAO:
                     for row in reader:
                         trainer_id = int(row['trainer_id']) if row['trainer_id'] else None
                         query = """
-                            INSERT INTO Pokemon (name, type, level, trainer_id) 
-                            VALUES (%s, %s, %s, %s)
+                            insert into pokemon (name, type, level, trainer_id) 
+                            values (%s, %s, %s, %s)
                         """
                         cursor.execute(query, (row['name'], row['type'], int(row['level']), trainer_id))
                     connection.commit()
-                    print("Import Pokémonů dokončen.")
+                    print("import pokémonů dokončen.")
         except FileNotFoundError:
             print(f"Soubor {file_path} nebyl nalezen.")
         except Exception as e:
-            print(f"Chyba při importu Pokémonů: {e}")
+            print(f"Chyba při importu pokémonů: {e}")
             connection.rollback()
         finally:
             connection.close()
+
+    @staticmethod
+    def get_pokemons_by_trainer_id(trainer_id, connection):
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM pokemon WHERE trainer_id = %s FOR SHARE"
+                cursor.execute(query, (trainer_id,))
+                rows = cursor.fetchall()
+                return [Pokemon(**row) for row in rows]
+        except Exception as e:
+            print(f"Chyba při načítání pokémonů: {e}")
+            return []

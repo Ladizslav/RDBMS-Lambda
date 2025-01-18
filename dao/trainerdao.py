@@ -1,5 +1,5 @@
 from db_connector import get_connection
-from trainer import Trainer
+from classes.trainer import Trainer
 import csv
 
 class TrainerDAO:
@@ -8,7 +8,7 @@ class TrainerDAO:
         connection = get_connection()
         try:
             with connection.cursor() as cursor:
-                query = "INSERT INTO Trainer (name, age, team) VALUES (%s, %s, %s)"
+                query = "insert into trainer (name, age, team) values (%s, %s, %s)"
                 cursor.execute(query, (name, age, team))
             connection.commit()
         except Exception as e:
@@ -22,7 +22,7 @@ class TrainerDAO:
         connection = get_connection()
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM Trainer WHERE trainer_id = %s"
+                query = "select * from trainer where id = %s"
                 cursor.execute(query, (trainer_id,))
                 row = cursor.fetchone()
                 if row:
@@ -38,29 +38,28 @@ class TrainerDAO:
         try:
             with connection.cursor() as cursor:
                 query = """
-                    UPDATE Trainer 
-                    SET name = %s, age = %s, team = %s 
-                    WHERE trainer_id = %s
+                    update trainer 
+                    set name = %s, age = %s, team = %s 
+                    where id = %s
                 """
                 cursor.execute(query, (name, age, team, trainer_id))
             connection.commit()
-            print(f"Trenér s ID {trainer_id} byl aktualizován.")
+            print(f"Trenér s id {trainer_id} byl aktualizován.")
         except Exception as e:
             print(f"Chyba při aktualizaci trenéra: {e}")
             connection.rollback()
         finally:
             connection.close()
 
+
     @staticmethod
     def delete_trainer(trainer_id):
         connection = get_connection()
         try:
-            TrainerDAO.show_trainers_count(connection)
             with connection.cursor() as cursor:
-                query = "DELETE FROM Trainer WHERE trainer_id = %s"
+                query = "delete from trainer where id = %s"
                 cursor.execute(query, (trainer_id,))
             connection.commit()
-            TrainerDAO.show_trainers_count(connection)
         except Exception as e:
             print(f"Chyba při mazání trenéra: {e}")
             connection.rollback()
@@ -72,7 +71,7 @@ class TrainerDAO:
         connection = get_connection()
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM Trainer"
+                query = "select * from trainer"
                 cursor.execute(query)
                 rows = cursor.fetchall()
                 return [Trainer(**row) for row in rows]
@@ -86,7 +85,7 @@ class TrainerDAO:
     def show_trainers_count(connection):
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT COUNT(*) FROM Trainer")
+                cursor.execute("select count(*) from trainer")
                 row = cursor.fetchone()
                 print(f"Počet trenérů: {row[0]}")
         except Exception as e:
@@ -102,8 +101,8 @@ class TrainerDAO:
                 with connection.cursor() as cursor:
                     for row in reader:
                         query = """
-                            INSERT INTO Trainer (name, age, team) 
-                            VALUES (%s, %s, %s)
+                            insert into trainer (name, age, team) 
+                            values (%s, %s, %s)
                         """
                         cursor.execute(query, (row['name'], int(row['age']), row['team']))
                     connection.commit()
@@ -111,7 +110,7 @@ class TrainerDAO:
         except FileNotFoundError:
             print(f"Soubor {file_path} nebyl nalezen.")
         except Exception as e:
-            print(f"Chyba při importu trenérů: {e}")
+            print(f"Chyba při importu: {e}")
             connection.rollback()
         finally:
             connection.close()

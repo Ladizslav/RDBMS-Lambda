@@ -1,4 +1,4 @@
-from gym import Gym
+from classes.gym import Gym
 from db_connector import get_connection
 
 class GymDAO:
@@ -11,7 +11,7 @@ class GymDAO:
                 cursor.execute(query, (name, city))
             connection.commit()
         except Exception as e:
-            print(f"chyba při vytváření gymu: {e}")
+            print(f"Chyba při vytváření gymu: {e}")
             connection.rollback()
         finally:
             connection.close()
@@ -21,7 +21,7 @@ class GymDAO:
         connection = get_connection()
         try:
             with connection.cursor(dictionary=True) as cursor:
-                query = "select * from gym where gym_id = %s"
+                query = "select * from gym where id = %s"
                 cursor.execute(query, (gym_id,))
                 row = cursor.fetchone()
                 if row:
@@ -38,7 +38,7 @@ class GymDAO:
             GymDAO.show_gyms_count(connection)
             
             with connection.cursor() as cursor:
-                query = "delete from gym where gym_id = %s"
+                query = "delete from gym where id = %s"
                 cursor.execute(query, (gym_id,))
             connection.commit()
             GymDAO.show_gyms_count(connection)
