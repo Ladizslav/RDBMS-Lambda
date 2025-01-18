@@ -4,7 +4,7 @@ from dao.pokemondao import PokemonDAO
 from dao.trainergymdao import TrainerGymDAO
 from dao.pokemonstatsdao import PokemonStatsDAO
 from utils.validators import get_non_empty_input, get_int_in_range, get_valid_trainer_id, get_trainer_id_input, get_valid_pokemon_type, get_pokemon_id_input, get_valid_pokemon_with_stats_id, get_valid_gym_id, get_valid_trainer_id_for_trainer_gym, get_valid_float, get_valid_gym_id_for_trainer_gym, get_pokemon_type_report, get_trainer_stats_report
-from db_connector import get_connection
+from db.db_connector import get_connection
 import threading
 import time
 
@@ -84,7 +84,7 @@ def manage_trainers():
             TrainerDAO.delete_trainer(trainer_id)
 
         elif choice == "5":
-            file_path = "trainer.csv"
+            file_path = "csv/trainer.csv"
             TrainerDAO.import_trainers_from_csv(file_path)
 
         elif choice == "6":
@@ -129,7 +129,7 @@ def manage_pokemons():
                 print(f"Chyba při mazání Pokémona: {e}")
 
         elif choice == "4":
-            file_path = "pokemon.csv"
+            file_path = "csv/pokemon.csv"
             PokemonDAO.import_pokemons_from_csv(file_path)
             
         elif choice == "5":

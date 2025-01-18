@@ -1,4 +1,4 @@
-from db_connector import get_connection
+from db.db_connector import get_connection
 from classes.trainer import Trainer
 import csv
 

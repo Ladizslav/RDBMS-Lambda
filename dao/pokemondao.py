@@ -1,4 +1,4 @@
-from db_connector import get_connection
+from db.db_connector import get_connection
 from classes.pokemon import Pokemon
 import csv
 

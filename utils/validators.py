@@ -3,7 +3,7 @@ from dao.trainerdao import TrainerDAO
 from dao.pokemondao import PokemonDAO
 from dao.trainergymdao import TrainerGymDAO
 from dao.pokemonstatsdao import PokemonStatsDAO
-from db_connector import get_connection
+from db.db_connector import get_connection
 
 
 

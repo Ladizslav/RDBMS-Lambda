@@ -1,5 +1,5 @@
 from classes.gym import Gym
-from db_connector import get_connection
+from db.db_connector import get_connection
 
 class GymDAO:
     @staticmethod

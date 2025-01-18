@@ -1,5 +1,5 @@
-from db_connector import get_connection
-from table_initiator import create_tables_and_views
+from db.db_connector import get_connection
+from db.table_initiator import create_tables_and_views
 from models.main_functions import show_menu, manage_trainers, manage_pokemons, manage_gyms, manage_trainer_gym_assignments, manage_pokemon_stats, manage_transaction_isolation, test_phantom_read, show_pokemon_type_report, show_trainer_stats_report
 from utils.validators import get_valid_trainer_id
 
